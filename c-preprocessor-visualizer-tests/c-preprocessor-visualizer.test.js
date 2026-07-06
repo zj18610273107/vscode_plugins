@@ -423,9 +423,21 @@ assert.deepStrictEqual(
 );
 
 assert.deepStrictEqual(
+  filterInactiveLinesForActiveBlock(nestedInactiveParsed.inactiveLines),
+  nestedInactiveParsed.inactiveLines,
+  'inactive branch markers should remain visible when the cursor enters an outer inactive block'
+);
+
+assert.deepStrictEqual(
+  filterInactiveLinesForActiveBlock(nestedInactiveParsed.inactiveLines),
+  nestedInactiveParsed.inactiveLines,
+  'inactive branch markers should remain visible when the cursor enters a nested inactive branch'
+);
+
+assert.deepStrictEqual(
   filterInactiveLinesForActiveBlock([2, 3, 4, 8, 9], 3),
-  [8, 9],
-  'inactive block containing the active cursor line should be shown with normal colors'
+  [2, 3, 4, 8, 9],
+  'inactive lines should remain marked when the cursor is inside inactive blocks'
 );
 
 assert.deepStrictEqual(
@@ -462,13 +474,9 @@ assert.deepStrictEqual(
 );
 
 assert.deepStrictEqual(
-  filterInactiveLinesForActiveBlock(
-    inactiveRegionParsed.inactiveLines,
-    4,
-    inactiveRegionParsed.inactiveRegions
-  ),
-  [],
-  'cursor on a blank line inside an inactive region should restore the whole region'
+  filterInactiveLinesForActiveBlock(inactiveRegionParsed.inactiveLines),
+  [3, 5],
+  'cursor on a blank line inside an inactive region should not hide inactive markers'
 );
 
 console.log('C preprocessor visualizer tests passed');

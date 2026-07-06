@@ -5,8 +5,8 @@
 它会在编辑 C/C++ 文件时辅助查看条件编译结构：
 
 - 点击 `#if`、`#ifdef`、`#ifndef`、`#elif`、`#else`、`#endif` 指令本身时，高亮同一组预处理指令。
-- 对当前未启用的条件编译代码区域使用绿色显示。
-- 光标进入未启用的连续代码区域时，该区域会恢复正常颜色，方便临时阅读和编辑。
+- 对当前未启用的条件编译代码区域，在行号和代码之间显示绿色竖线，不改变代码文字颜色。
+- 光标进入未启用区域时，gutter 竖线保持不变。
 - 可选：在未启用区域提供轻量 C 语言补全，弥补 clangd 对 inactive 代码补全较弱的问题。
 - 处理当前打开并获得焦点的文件，同时会尝试解析项目内的 `#include "..."` 头文件宏。
 - 会读取 `build/compile_commands.json` 中的 `-D`、`-U` 和 `-I` 参数。
@@ -30,7 +30,7 @@ int no_feature = 1;
 
 当光标点击 `#if`、`#elif`、`#else` 或 `#endif` 这些指令 token 时，插件会把同一组里的预处理指令一起标识出来。
 
-未启用的代码分支会显示为绿色，默认颜色为：
+未启用的代码分支会在行号和代码之间显示绿色竖线，默认提示颜色为：
 
 ```text
 #5ac83cd9
@@ -48,7 +48,7 @@ code .
 
 在新窗口中打开任意 `.c`、`.h`、`.cpp`、`.hpp` 等 C/C++ 文件，点击预处理指令即可查看效果。
 
-注意：需要点击指令本身，比如 `#ifdef` 这几个字符；点击同一行的宏名或空白区域不会触发高亮。
+注意：需要点击指令本身，比如 `#ifdef` 这几个字符；光标在指令 token 后面的空白位置也会触发，但点击同一行的宏名不会触发高亮。
 
 ## 运行测试
 
@@ -138,7 +138,7 @@ c-preprocessor-visualizer-tests/
 
 ## 配置项
 
-可以在 VS Code 设置中修改 inactive 区域颜色：
+可以在 VS Code 设置中修改 inactive 区域竖线颜色和透明度：
 
 ```json
 {
@@ -151,9 +151,9 @@ c-preprocessor-visualizer-tests/
 
 说明：
 
-- `inactiveColor`：关闭区域文字颜色。
-- `inactiveOpacity`：关闭区域透明度，范围 `0.1` 到 `1`。
-- `showInactiveRegions`：是否显示关闭区域颜色。
+- `inactiveColor`：关闭区域左侧竖线颜色。
+- `inactiveOpacity`：关闭区域左侧竖线透明度，范围 `0.1` 到 `1`。
+- `showInactiveRegions`：是否显示关闭区域左侧竖线。
 - `enableInactiveCompletions`：是否在关闭区域启用轻量补全。
 
 ## Inactive 区域补全

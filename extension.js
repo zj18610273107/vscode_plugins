@@ -2,7 +2,6 @@ const vscode = require('vscode');
 const {
   parseDocument,
   findMatchingDirectiveLines,
-  filterInactiveLinesForActiveBlock,
   getDirectiveSpan,
   getDirectiveActivationSpan,
   isCharacterInDirectiveSpan
@@ -114,7 +113,12 @@ function createDecorations() {
   });
 
   inactiveDecoration = vscode.window.createTextEditorDecorationType({
-    color: applyOpacityToColor(inactiveColor, clamp(inactiveOpacity, 0.1, 1))
+    isWholeLine: true,
+    borderColor: applyOpacityToColor(inactiveColor, clamp(inactiveOpacity, 0.1, 1)),
+    borderStyle: 'solid',
+    borderWidth: '0 0 0 3px',
+    overviewRulerColor: applyOpacityToColor(inactiveColor, 0.85),
+    overviewRulerLane: vscode.OverviewRulerLane.Left
   });
 }
 
@@ -128,15 +132,10 @@ function updateDecorations() {
   const showInactiveRegions = vscode.workspace
     .getConfiguration('cPreprocessorVisualizer')
     .get('showInactiveRegions', true);
-  const inactiveLines = filterInactiveLinesForActiveBlock(
-    parsed.inactiveLines,
-    editor.selection.active.line,
-    parsed.inactiveRegions
-  );
   editor.setDecorations(
     inactiveDecoration,
     showInactiveRegions
-      ? inactiveLines.map((line) => editor.document.lineAt(line).range)
+      ? createInactiveRegionRanges(editor.document, parsed.inactiveRegions)
       : []
   );
   editor.setDecorations(matchDecoration, findMatchingDirectiveRanges(editor, parsed.groups));
@@ -295,6 +294,17 @@ function findMatchingDirectiveRanges(editor, groups) {
       return new vscode.Range(line, span.start, line, span.end);
     })
     .filter(Boolean);
+}
+
+function createInactiveRegionRanges(document, inactiveRegions = []) {
+  const ranges = [];
+  for (const { start, end } of inactiveRegions) {
+    const lastLine = Math.min(end, document.lineCount - 1);
+    for (let line = Math.max(start, 0); line <= lastLine; line++) {
+      ranges.push(document.lineAt(line).range);
+    }
+  }
+  return ranges;
 }
 
 module.exports = {

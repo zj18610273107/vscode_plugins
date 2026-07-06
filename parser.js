@@ -55,7 +55,8 @@ function parseDocument(document, options = {}) {
       }
       const condition = evaluateExpression(directive.argument, macros);
       frame.elifLines.push(line);
-      frame.currentActive = frame.parentActive && !frame.branchTaken && condition;
+      const branchActive = !frame.branchTaken && condition;
+      frame.currentActive = frame.parentActive && branchActive;
       frame.branchTaken = frame.branchTaken || condition;
       updateInactiveRegion(lineInInactiveRegion, line);
       continue;
@@ -71,8 +72,9 @@ function parseDocument(document, options = {}) {
         lineInInactiveRegion = true;
         inactiveLines.push(line);
       }
+      const branchActive = !frame.branchTaken;
       frame.elseLine = line;
-      frame.currentActive = frame.parentActive && !frame.branchTaken;
+      frame.currentActive = frame.parentActive && branchActive;
       frame.branchTaken = true;
       updateInactiveRegion(lineInInactiveRegion, line);
       continue;
@@ -168,6 +170,7 @@ function parseDocument(document, options = {}) {
     });
     inactiveRegionStart = undefined;
   }
+
 }
 
 function parseDirective(text) {
@@ -274,29 +277,8 @@ function findMatchingDirectiveLines(document, cursorLine, groups) {
   return [];
 }
 
-function filterInactiveLinesForActiveBlock(inactiveLines, activeLine, inactiveRegions = []) {
-  const region = inactiveRegions.find(({ start, end }) => activeLine >= start && activeLine <= end);
-  if (region) {
-    return inactiveLines.filter((line) => line < region.start || line > region.end);
-  }
-
-  if (!inactiveLines.includes(activeLine)) {
-    return inactiveLines;
-  }
-
-  const inactiveSet = new Set(inactiveLines);
-  let start = activeLine;
-  let end = activeLine;
-
-  while (inactiveSet.has(start - 1)) {
-    start -= 1;
-  }
-
-  while (inactiveSet.has(end + 1)) {
-    end += 1;
-  }
-
-  return inactiveLines.filter((line) => line < start || line > end);
+function filterInactiveLinesForActiveBlock(inactiveLines) {
+  return inactiveLines;
 }
 
 function getDirectiveSpan(text) {
