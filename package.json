@@ -52,7 +52,7 @@
         },
         "cPreprocessorVisualizer.inactiveCodeOpacity": {
           "type": "number",
-          "default": 1,
+          "default": 0.5,
           "minimum": 0.1,
           "maximum": 1,
           "description": "未启用的闭合区域内普通代码文字透明度，不作用于 #if/#elif/#else/#endif 指令本身，1 表示不透明，0.1 表示最淡。"

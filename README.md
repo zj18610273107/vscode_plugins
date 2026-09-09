@@ -145,7 +145,7 @@ c-preprocessor-visualizer-tests/
   "cPreprocessorVisualizer.inactiveColor": "#5ac83cd9",
   "cPreprocessorVisualizer.inactiveOpacity": 1,
   "cPreprocessorVisualizer.showInactiveRegions": true,
-  "cPreprocessorVisualizer.inactiveCodeOpacity": 1,
+  "cPreprocessorVisualizer.inactiveCodeOpacity": 0.5,
   "cPreprocessorVisualizer.enableInactiveCompletions": true
 }
 ```

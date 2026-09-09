@@ -110,7 +110,7 @@ function createDecorations() {
     .get('inactiveOpacity', 1);
   const inactiveCodeOpacity = vscode.workspace
     .getConfiguration('cPreprocessorVisualizer')
-    .get('inactiveCodeOpacity', 1);
+    .get('inactiveCodeOpacity', 0.5);
 
   matchDecoration = vscode.window.createTextEditorDecorationType({
     backgroundColor: 'rgba(255, 214, 102, 0.22)',
