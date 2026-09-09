@@ -27,7 +27,7 @@
   ],
   "scripts": {
     "test": "node --check extension.js && node --check parser.js && node --check project-context.js && node --check completion.js && node c-preprocessor-visualizer-tests/c-preprocessor-visualizer.test.js && node c-preprocessor-visualizer-tests/project-context.test.js && node c-preprocessor-visualizer-tests/completion.test.js",
-    "package": "vsce package --no-dependencies --allow-missing-repository"
+    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license"
   },
   "contributes": {
     "configuration": {
