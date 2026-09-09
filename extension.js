@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const {
   parseDocument,
+  parseDirective,
   findMatchingDirectiveLines,
   getDirectiveSpan,
   getDirectiveActivationSpan,
@@ -14,6 +15,7 @@ const { createParseOptionsForFile } = require('./project-context');
 
 let matchDecoration;
 let inactiveDecoration;
+let inactiveCodeDecoration;
 let activeEditor;
 let refreshTimer;
 const parseCache = new Map();
@@ -41,7 +43,8 @@ function activate(context) {
       if (
         event.affectsConfiguration('cPreprocessorVisualizer.inactiveColor') ||
         event.affectsConfiguration('cPreprocessorVisualizer.inactiveOpacity') ||
-        event.affectsConfiguration('cPreprocessorVisualizer.showInactiveRegions')
+        event.affectsConfiguration('cPreprocessorVisualizer.showInactiveRegions') ||
+        event.affectsConfiguration('cPreprocessorVisualizer.inactiveCodeOpacity')
       ) {
         createDecorations();
         updateDecorations();
@@ -97,6 +100,7 @@ function scheduleUpdateDecorations() {
 function createDecorations() {
   matchDecoration?.dispose();
   inactiveDecoration?.dispose();
+  inactiveCodeDecoration?.dispose();
 
   const inactiveColor = vscode.workspace
     .getConfiguration('cPreprocessorVisualizer')
@@ -104,6 +108,9 @@ function createDecorations() {
   const inactiveOpacity = vscode.workspace
     .getConfiguration('cPreprocessorVisualizer')
     .get('inactiveOpacity', 1);
+  const inactiveCodeOpacity = vscode.workspace
+    .getConfiguration('cPreprocessorVisualizer')
+    .get('inactiveCodeOpacity', 1);
 
   matchDecoration = vscode.window.createTextEditorDecorationType({
     backgroundColor: 'rgba(255, 214, 102, 0.22)',
@@ -113,12 +120,14 @@ function createDecorations() {
   });
 
   inactiveDecoration = vscode.window.createTextEditorDecorationType({
-    isWholeLine: true,
-    borderColor: applyOpacityToColor(inactiveColor, clamp(inactiveOpacity, 0.1, 1)),
-    borderStyle: 'solid',
-    borderWidth: '0 0 0 3px',
     overviewRulerColor: applyOpacityToColor(inactiveColor, 0.85),
-    overviewRulerLane: vscode.OverviewRulerLane.Left
+    overviewRulerLane: vscode.OverviewRulerLane.Left,
+    gutterIconPath: createInactiveGutterIconUri(inactiveColor, clamp(inactiveOpacity, 0.1, 1)),
+    gutterIconSize: 'contain'
+  });
+
+  inactiveCodeDecoration = vscode.window.createTextEditorDecorationType({
+    opacity: String(clamp(inactiveCodeOpacity, 0.1, 1))
   });
 }
 
@@ -137,6 +146,10 @@ function updateDecorations() {
     showInactiveRegions
       ? createInactiveRegionRanges(editor.document, parsed.inactiveRegions)
       : []
+  );
+  editor.setDecorations(
+    inactiveCodeDecoration,
+    createInactiveCodeRanges(editor.document, parsed.inactiveRegions)
   );
   editor.setDecorations(matchDecoration, findMatchingDirectiveRanges(editor, parsed.groups));
 }
@@ -252,6 +265,17 @@ function applyOpacityToColor(color, opacity) {
   return `rgba(${parsed.red}, ${parsed.green}, ${parsed.blue}, ${alpha})`;
 }
 
+function createInactiveGutterIconUri(color, opacity) {
+  const parsed = parseHexColor(color) ?? parseHexColor('#5ac83cd9');
+  const alpha = Math.round(parsed.alpha * opacity * 1000) / 1000;
+  const svg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18">',
+    `<rect x="7" y="0" width="3" height="18" fill="rgb(${parsed.red}, ${parsed.green}, ${parsed.blue})" fill-opacity="${alpha}"/>`,
+    '</svg>'
+  ].join('');
+  return vscode.Uri.parse(`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`);
+}
+
 function parseHexColor(color) {
   const match = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
   if (!match) {
@@ -302,6 +326,21 @@ function createInactiveRegionRanges(document, inactiveRegions = []) {
     const lastLine = Math.min(end, document.lineCount - 1);
     for (let line = Math.max(start, 0); line <= lastLine; line++) {
       ranges.push(document.lineAt(line).range);
+    }
+  }
+  return ranges;
+}
+
+function createInactiveCodeRanges(document, inactiveRegions = []) {
+  const ranges = [];
+  for (const { start, end } of inactiveRegions) {
+    const lastLine = Math.min(end, document.lineCount - 1);
+    for (let line = Math.max(start, 0); line <= lastLine; line++) {
+      const textLine = document.lineAt(line);
+      if (parseDirective(textLine.text) || textLine.isEmptyOrWhitespace) {
+        continue;
+      }
+      ranges.push(textLine.range);
     }
   }
   return ranges;

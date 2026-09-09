@@ -2,7 +2,7 @@
   "name": "c-preprocessor-visualizer",
   "displayName": "C Preprocessor Visualizer",
   "description": "Highlights matching C preprocessor branches and dims inactive code.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "publisher": "local",
   "engines": {
     "vscode": "^1.90.0"
@@ -49,6 +49,13 @@
           "type": "boolean",
           "default": true,
           "description": "是否在行号和代码之间用绿色竖线标识关闭的预处理代码区域。"
+        },
+        "cPreprocessorVisualizer.inactiveCodeOpacity": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.1,
+          "maximum": 1,
+          "description": "未启用的闭合区域内普通代码文字透明度，不作用于 #if/#elif/#else/#endif 指令本身，1 表示不透明，0.1 表示最淡。"
         },
         "cPreprocessorVisualizer.enableInactiveCompletions": {
           "type": "boolean",

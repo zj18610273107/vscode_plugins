@@ -145,6 +145,7 @@ c-preprocessor-visualizer-tests/
   "cPreprocessorVisualizer.inactiveColor": "#5ac83cd9",
   "cPreprocessorVisualizer.inactiveOpacity": 1,
   "cPreprocessorVisualizer.showInactiveRegions": true,
+  "cPreprocessorVisualizer.inactiveCodeOpacity": 1,
   "cPreprocessorVisualizer.enableInactiveCompletions": true
 }
 ```
@@ -154,6 +155,7 @@ c-preprocessor-visualizer-tests/
 - `inactiveColor`：关闭区域左侧竖线颜色。
 - `inactiveOpacity`：关闭区域左侧竖线透明度，范围 `0.1` 到 `1`。
 - `showInactiveRegions`：是否显示关闭区域左侧竖线。
+- `inactiveCodeOpacity`：未启用的闭合区域内普通代码文字透明度，范围 `0.1` 到 `1`，不作用于 `#if/#elif/#else/#endif` 指令本身。
 - `enableInactiveCompletions`：是否在关闭区域启用轻量补全。
 
 ## Inactive 区域补全
