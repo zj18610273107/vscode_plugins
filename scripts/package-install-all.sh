@@ -9,35 +9,50 @@ cd "${repo_dir}"
 usage()
 {
   cat <<EOF
-usage: ${0##*/} [submodule_path ...]
+usage: ${0##*/} [extension_path ...]
 
-Without arguments, package and install all submodules.
-With arguments, package and install only the selected submodule paths.
+Without arguments, package and install all extensions.
+With arguments, package and install only the selected extension paths.
 EOF
 }
 
-if [ ! -f "${repo_dir}/.gitmodules" ]; then
-  echo "error: .gitmodules not found" >&2
+if [ ! -f "${repo_dir}/extensions.conf" ]; then
+  echo "error: extensions.conf not found" >&2
   exit 1
 fi
 
-mapfile -t submodule_paths < <(
-  git config --file "${repo_dir}/.gitmodules" --get-regexp '^submodule\..*\.path$' |
-    awk '{ print $2 }'
+declare -A extension_urls=()
+extension_paths=()
+
+while read -r extension_key extension_path; do
+  extension_name="${extension_key#extension.}"
+  extension_name="${extension_name%.path}"
+  extension_url="$(git config --file "${repo_dir}/extensions.conf" \
+    --get "extension.${extension_name}.url" || true)"
+
+  if [ -z "${extension_url}" ]; then
+    echo "error: no URL configured for ${extension_path}" >&2
+    exit 1
+  fi
+
+  extension_paths+=("${extension_path}")
+  extension_urls["${extension_path}"]="${extension_url}"
+done < <(
+  git config --file "${repo_dir}/extensions.conf" --get-regexp '^extension\..*\.path$'
 )
 
-if [ "${#submodule_paths[@]}" -eq 0 ]; then
-  echo "error: no submodules found in .gitmodules" >&2
+if [ "${#extension_paths[@]}" -eq 0 ]; then
+  echo "error: no extensions found in extensions.conf" >&2
   exit 1
 fi
 
-is_known_submodule()
+is_known_extension()
 {
   local requested_path="$1"
-  local submodule_path
+  local extension_path
 
-  for submodule_path in "${submodule_paths[@]}"; do
-    if [ "${submodule_path}" = "${requested_path}" ]; then
+  for extension_path in "${extension_paths[@]}"; do
+    if [ "${extension_path}" = "${requested_path}" ]; then
       return 0
     fi
   done
@@ -45,54 +60,58 @@ is_known_submodule()
   return 1
 }
 
-print_available_submodules()
+print_available_extensions()
 {
-  local submodule_path
+  local extension_path
 
-  echo "available submodules:" >&2
-  for submodule_path in "${submodule_paths[@]}"; do
-    echo "  ${submodule_path}" >&2
+  echo "available extensions:" >&2
+  for extension_path in "${extension_paths[@]}"; do
+    echo "  ${extension_path}" >&2
   done
 }
 
-install_submodule()
+install_extension()
 {
-  local submodule_path="$1"
-  local submodule_dir="${repo_dir}/${submodule_path}"
-  local package_install_script="${submodule_dir}/scripts/package-install.sh"
-  local recorded_commit
+  local extension_path="$1"
+  local extension_dir="${repo_dir}/${extension_path}"
+  local package_install_script="${extension_dir}/scripts/package-install.sh"
+  local extension_url="${extension_urls[${extension_path}]}"
   local package_status
 
-  recorded_commit="$(git rev-parse "HEAD:${submodule_path}")"
+  if [ ! -e "${extension_dir}" ]; then
+    echo "==> clone ${extension_path}"
+    git clone "${extension_url}" "${extension_dir}"
+  fi
 
-  if ! git -C "${submodule_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "error: ${submodule_path} is not an initialized git submodule" >&2
+  if ! git -C "${extension_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "error: ${extension_path} is not an initialized git repository" >&2
     exit 1
   fi
 
-  if [ -n "$(git -C "${submodule_dir}" status --porcelain)" ]; then
-    echo "error: ${submodule_path} has local changes; commit or clean it before install" >&2
+  if [ -n "$(git -C "${extension_dir}" status --porcelain)" ]; then
+    echo "error: ${extension_path} has local changes; commit or clean it before install" >&2
     exit 1
   fi
 
-  echo "==> update ${submodule_path} to origin/master"
-  git -C "${submodule_dir}" fetch origin master
-  git -C "${submodule_dir}" checkout --detach origin/master
+  echo "==> update ${extension_path} to origin/master"
+  git -C "${extension_dir}" fetch origin master
+  if git -C "${extension_dir}" show-ref --verify --quiet refs/heads/master; then
+    git -C "${extension_dir}" switch master
+  else
+    git -C "${extension_dir}" switch --track -c master origin/master
+  fi
+  git -C "${extension_dir}" pull --ff-only origin master
 
   if [ ! -x "${package_install_script}" ]; then
-    echo "error: ${submodule_path} does not provide scripts/package-install.sh" >&2
-    git -C "${submodule_dir}" checkout --detach "${recorded_commit}"
+    echo "error: ${extension_path} does not provide scripts/package-install.sh" >&2
     exit 1
   fi
 
-  echo "==> package and install ${submodule_path}"
+  echo "==> package and install ${extension_path}"
   set +e
   "${package_install_script}"
   package_status="$?"
   set -e
-
-  echo "==> restore ${submodule_path} to ${recorded_commit}"
-  git -C "${submodule_dir}" checkout --detach "${recorded_commit}"
 
   return "${package_status}"
 }
@@ -100,7 +119,7 @@ install_submodule()
 selected_paths=()
 
 if [ "$#" -eq 0 ]; then
-  selected_paths=("${submodule_paths[@]}")
+  selected_paths=("${extension_paths[@]}")
 else
   for requested_path in "$@"; do
     case "${requested_path}" in
@@ -110,9 +129,9 @@ else
         ;;
     esac
 
-    if ! is_known_submodule "${requested_path}"; then
-      echo "error: unknown submodule: ${requested_path}" >&2
-      print_available_submodules
+    if ! is_known_extension "${requested_path}"; then
+      echo "error: unknown extension: ${requested_path}" >&2
+      print_available_extensions
       exit 1
     fi
 
@@ -120,6 +139,6 @@ else
   done
 fi
 
-for submodule_path in "${selected_paths[@]}"; do
-  install_submodule "${submodule_path}"
+for extension_path in "${selected_paths[@]}"; do
+  install_extension "${extension_path}"
 done
