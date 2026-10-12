@@ -39,3 +39,16 @@ int temp_flag_enabled = 1;
 #else
 int temp_flag_disabled = 1;
 #endif
+
+/* Space between # and the directive keyword */
+# if FEATURE_ALPHA
+int spaced_if_active = 1;
+# else
+int spaced_if_inactive = 1;
+# endif
+
+# if FEATURE_BETA
+int spaced_else_inactive = 1;
+# else
+int spaced_else_active = 1;
+# endif

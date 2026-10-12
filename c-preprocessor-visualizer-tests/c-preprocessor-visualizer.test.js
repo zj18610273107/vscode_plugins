@@ -363,6 +363,31 @@ assert.deepStrictEqual(
   'directive spans should include spaced #ifdef tokens'
 );
 
+const SINGLE_SPACED_DIRECTIVE_SOURCE = `
+# if BASE_ENABLED
+int single_spaced_directive_active = 1;
+# else
+int single_spaced_directive_inactive = 1;
+# endif
+`.trim();
+
+const singleSpacedDirectiveDocument = createDocument(SINGLE_SPACED_DIRECTIVE_SOURCE);
+const singleSpacedDirectiveParsed = parseDocument(singleSpacedDirectiveDocument, {
+  initialMacros: [['BASE_ENABLED', '1']]
+});
+
+assert.deepStrictEqual(
+  singleSpacedDirectiveParsed.inactiveLines,
+  [3],
+  '# if/# else/# endif should be parsed with a space between # and the directive'
+);
+
+assert.deepStrictEqual(
+  findMatchingDirectiveLines(singleSpacedDirectiveDocument, 0, singleSpacedDirectiveParsed.groups),
+  [0, 2, 4],
+  '# if should match its # else and # endif'
+);
+
 const NESTED_IN_INACTIVE_SOURCE = `
 #define CONFIG_ENABLE_LOG_DATE 0
 #define CONFIG_ENABLE_LOG_TIME 0

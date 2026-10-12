@@ -71,6 +71,7 @@ npm test
 
 当前解析器支持：
 
+- `#` 与指令关键字之间允许空格，例如 `# if`、`# else`、`# endif`。
 - `#define`
 - `#undef`
 - `#if`
