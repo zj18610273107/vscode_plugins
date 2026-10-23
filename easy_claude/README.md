@@ -56,6 +56,8 @@
 
 ## 打包安装
 
+在 `vscode_plugins` 仓库根目录执行：
+
 ```bash
-scripts/package-install.sh
+scripts/package-install-all.sh easy_claude
 ```

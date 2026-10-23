@@ -9,40 +9,30 @@ cd "${repo_dir}"
 usage()
 {
   cat <<EOF
-usage: ${0##*/} [extension_path ...]
+usage: ${0##*/} [extension_dir ...]
 
 Without arguments, package and install all extensions.
-With arguments, package and install only the selected extension paths.
+With arguments, package and install only the selected extension directories.
+An extension directory is any top-level directory containing package.json.
 EOF
 }
 
-if [ ! -f "${repo_dir}/extensions.conf" ]; then
-  echo "error: extensions.conf not found" >&2
-  exit 1
-fi
-
-declare -A extension_urls=()
-extension_paths=()
-
-while read -r extension_key extension_path; do
-  extension_name="${extension_key#extension.}"
-  extension_name="${extension_name%.path}"
-  extension_url="$(git config --file "${repo_dir}/extensions.conf" \
-    --get "extension.${extension_name}.url" || true)"
-
-  if [ -z "${extension_url}" ]; then
-    echo "error: no URL configured for ${extension_path}" >&2
+for tool in node npm code; do
+  if ! command -v "${tool}" >/dev/null 2>&1; then
+    echo "error: ${tool} is required" >&2
     exit 1
   fi
+done
 
-  extension_paths+=("${extension_path}")
-  extension_urls["${extension_path}"]="${extension_url}"
-done < <(
-  git config --file "${repo_dir}/extensions.conf" --get-regexp '^extension\..*\.path$'
-)
+extension_paths=()
+
+for package_json in "${repo_dir}"/*/package.json; do
+  [ -f "${package_json}" ] || continue
+  extension_paths+=("$(basename "$(dirname "${package_json}")")")
+done
 
 if [ "${#extension_paths[@]}" -eq 0 ]; then
-  echo "error: no extensions found in extensions.conf" >&2
+  echo "error: no extension directories found" >&2
   exit 1
 fi
 
@@ -74,46 +64,35 @@ install_extension()
 {
   local extension_path="$1"
   local extension_dir="${repo_dir}/${extension_path}"
-  local package_install_script="${extension_dir}/scripts/package-install.sh"
-  local extension_url="${extension_urls[${extension_path}]}"
-  local package_status
-
-  if [ ! -e "${extension_dir}" ]; then
-    echo "==> clone ${extension_path}"
-    git clone "${extension_url}" "${extension_dir}"
-  fi
-
-  if ! git -C "${extension_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "error: ${extension_path} is not an initialized git repository" >&2
-    exit 1
-  fi
-
-  if [ -n "$(git -C "${extension_dir}" status --porcelain)" ]; then
-    echo "error: ${extension_path} has local changes; commit or clean it before install" >&2
-    exit 1
-  fi
-
-  echo "==> update ${extension_path} to origin/master"
-  git -C "${extension_dir}" fetch origin master
-  if git -C "${extension_dir}" show-ref --verify --quiet refs/heads/master; then
-    git -C "${extension_dir}" switch master
-  else
-    git -C "${extension_dir}" switch --track -c master origin/master
-  fi
-  git -C "${extension_dir}" pull --ff-only origin master
-
-  if [ ! -x "${package_install_script}" ]; then
-    echo "error: ${extension_path} does not provide scripts/package-install.sh" >&2
-    exit 1
-  fi
+  local package_name
+  local package_version
+  local vsix_path
 
   echo "==> package and install ${extension_path}"
-  set +e
-  "${package_install_script}"
-  package_status="$?"
-  set -e
+  cd "${extension_dir}"
 
-  return "${package_status}"
+  package_name="$(node -p "require('./package.json').name")"
+  package_version="$(node -p "require('./package.json').version")"
+  vsix_path="${extension_dir}/${package_name}-${package_version}.vsix"
+
+  if [ -f package-lock.json ] && [ ! -d node_modules ]; then
+    npm ci
+  fi
+
+  # vsce runs the vscode:prepublish build step of each extension.
+  if [ -x node_modules/.bin/vsce ]; then
+    node_modules/.bin/vsce package --no-dependencies --allow-missing-repository --skip-license
+  else
+    npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository --skip-license
+  fi
+
+  if [ ! -f "${vsix_path}" ]; then
+    echo "error: package did not create ${vsix_path}" >&2
+    exit 1
+  fi
+
+  code --install-extension "${vsix_path}" --force
+  echo "installed ${vsix_path}"
 }
 
 selected_paths=()
@@ -122,6 +101,7 @@ if [ "$#" -eq 0 ]; then
   selected_paths=("${extension_paths[@]}")
 else
   for requested_path in "$@"; do
+    requested_path="${requested_path%/}"
     case "${requested_path}" in
       -h|--help)
         usage
