@@ -2,8 +2,9 @@
   "name": "c-preprocessor-visualizer",
   "displayName": "C Preprocessor Visualizer",
   "description": "Highlights matching C preprocessor branches and dims inactive code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "local",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -23,6 +24,7 @@
     "completion.js",
     "parser.js",
     "project-context.js",
+    "icon.png",
     "README.md"
   ],
   "scripts": {
