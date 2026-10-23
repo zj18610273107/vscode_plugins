@@ -1,0 +1,71 @@
+{
+  "name": "c-preprocessor-visualizer",
+  "displayName": "C Preprocessor Visualizer",
+  "description": "Highlights matching C preprocessor branches and dims inactive code.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:objective-c",
+    "onLanguage:objective-cpp",
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "files": [
+    "extension.js",
+    "completion.js",
+    "parser.js",
+    "project-context.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --check extension.js && node --check parser.js && node --check project-context.js && node --check completion.js && node c-preprocessor-visualizer-tests/c-preprocessor-visualizer.test.js && node c-preprocessor-visualizer-tests/project-context.test.js && node c-preprocessor-visualizer-tests/completion.test.js",
+    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "C 预处理可视化",
+      "properties": {
+        "cPreprocessorVisualizer.inactiveColor": {
+          "type": "string",
+          "default": "#5ac83cd9",
+          "description": "关闭的预处理代码区域左侧竖线颜色。"
+        },
+        "cPreprocessorVisualizer.inactiveOpacity": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.1,
+          "maximum": 1,
+          "description": "关闭的预处理代码区域左侧竖线透明度，1 表示不透明，0.1 表示最淡。"
+        },
+        "cPreprocessorVisualizer.showInactiveRegions": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否在行号和代码之间用绿色竖线标识关闭的预处理代码区域。"
+        },
+        "cPreprocessorVisualizer.inactiveCodeOpacity": {
+          "type": "number",
+          "default": 0.5,
+          "minimum": 0.1,
+          "maximum": 1,
+          "description": "未启用的闭合区域内普通代码文字透明度，不作用于 #if/#elif/#else/#endif 指令本身，1 表示不透明，0.1 表示最淡。"
+        },
+        "cPreprocessorVisualizer.enableInactiveCompletions": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否在关闭的预处理代码区域启用轻量 C 语言补全。"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.9.2"
+  }
+}

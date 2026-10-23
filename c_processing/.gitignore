@@ -1,0 +1,4 @@
+node_modules/
+*.vsix
+*.tar.gz
+build/c-preprocessor-visualizer-cache.json
