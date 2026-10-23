@@ -1,0 +1,172 @@
+{
+  "name": "codex-code-selected",
+  "displayName": "Code Selected (Claude / Codex)",
+  "description": "Send selected code to Claude Code CLI or Codex CLI running in the VS Code terminal",
+  "version": "0.2.0",
+  "publisher": "codex-publisher",
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": [
+      {
+        "title": "选中代码发送",
+        "properties": {
+          "codeSelected.cli": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "codex"
+            ],
+            "enumDescriptions": [
+              "Claude Code CLI：发送 @路径#L行号 引用，终端粘贴使用 VS Code 原生行为。",
+              "Codex CLI：发送路径:行号或原始代码，终端 Ctrl+V 支持粘贴图片。"
+            ],
+            "default": "claude",
+            "description": "选中代码发送到哪个 CLI，决定右键菜单、命令面板、快捷键和终端粘贴行为。"
+          }
+        }
+      },
+      {
+        "title": "Claude",
+        "properties": {
+          "easyClaude.autoSubmit": {
+            "type": "boolean",
+            "default": false,
+            "description": "将选中的代码粘贴到 Claude CLI 终端后，是否自动按回车提交。"
+          },
+          "easyClaude.prefix": {
+            "type": "string",
+            "default": "",
+            "description": "发送选中代码位置时添加的前缀。前缀非空时，会在前缀后换行再附加路径和行号。"
+          }
+        }
+      },
+      {
+        "title": "Codex",
+        "properties": {
+          "codex.autoSubmit": {
+            "type": "boolean",
+            "default": false,
+            "description": "将选中的代码粘贴到 Codex CLI 终端后，是否自动按回车提交。"
+          },
+          "codex.prefix": {
+            "type": "string",
+            "default": "",
+            "description": "发送选中代码时添加的前缀。前缀非空时，会在前缀后换行再附加原始代码。"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "easyClaude.sendSelectedCode",
+        "title": "Claude: 发送选中代码到 CLI（带前缀）"
+      },
+      {
+        "command": "easyClaude.sendSelectedCodeWithoutPrefix",
+        "title": "Claude: 发送选中代码到 CLI（不带前缀）"
+      },
+      {
+        "command": "codex.sendSelectedCode",
+        "title": "Codex: 发送选中代码到 CLI（带前缀）"
+      },
+      {
+        "command": "codex.sendSelectedCodeWithoutPrefix",
+        "title": "Codex: 发送选中代码到 CLI（不带前缀）"
+      },
+      {
+        "command": "codex.smartTerminalPaste",
+        "title": "Codex: 终端智能粘贴"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "easyClaude.sendSelectedCode",
+        "key": "ctrl+alt+l",
+        "when": "editorTextFocus && config.codeSelected.cli == 'claude'"
+      },
+      {
+        "command": "codex.sendSelectedCode",
+        "key": "ctrl+alt+c",
+        "when": "editorTextFocus && config.codeSelected.cli == 'codex'"
+      },
+      {
+        "command": "codex.smartTerminalPaste",
+        "key": "ctrl+v",
+        "when": "terminalFocus && config.codeSelected.cli == 'codex'"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "easyClaude.sendSelectedCode",
+          "when": "config.codeSelected.cli == 'claude'"
+        },
+        {
+          "command": "easyClaude.sendSelectedCodeWithoutPrefix",
+          "when": "config.codeSelected.cli == 'claude'"
+        },
+        {
+          "command": "codex.sendSelectedCode",
+          "when": "config.codeSelected.cli == 'codex'"
+        },
+        {
+          "command": "codex.sendSelectedCodeWithoutPrefix",
+          "when": "config.codeSelected.cli == 'codex'"
+        },
+        {
+          "command": "codex.smartTerminalPaste",
+          "when": "config.codeSelected.cli == 'codex'"
+        }
+      ],
+      "terminal/context": [
+        {
+          "command": "codex.smartTerminalPaste",
+          "group": "navigation@1",
+          "when": "terminalFocus && config.codeSelected.cli == 'codex'"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "easyClaude.sendSelectedCode",
+          "group": "claude@1",
+          "when": "editorTextFocus && config.codeSelected.cli == 'claude'"
+        },
+        {
+          "command": "easyClaude.sendSelectedCodeWithoutPrefix",
+          "group": "claude@2",
+          "when": "editorTextFocus && config.codeSelected.cli == 'claude'"
+        },
+        {
+          "command": "codex.sendSelectedCode",
+          "group": "codex@1",
+          "when": "editorTextFocus && config.codeSelected.cli == 'codex'"
+        },
+        {
+          "command": "codex.sendSelectedCodeWithoutPrefix",
+          "group": "codex@2",
+          "when": "editorTextFocus && config.codeSelected.cli == 'codex'"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "echo 'No build step required'"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0"
+  }
+}

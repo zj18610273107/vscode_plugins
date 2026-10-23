@@ -19,34 +19,6 @@ const COPY_RESPONSE_OK = 1;
 const COPY_SOCKET_TIMEOUT_MS = 2000;
 const MAX_COPY_RESPONSE_BYTES = 4 * 1024 * 1024;
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-	const sendWithPrefixCommand = vscode.commands.registerCommand(
-		'codex.sendSelectedCode',
-		() => sendSelectedCode(true)
-	);
-	const sendWithoutPrefixCommand = vscode.commands.registerCommand(
-		'codex.sendSelectedCodeWithoutPrefix',
-		() => sendSelectedCode(false)
-	);
-	const smartTerminalPasteCommand = vscode.commands.registerCommand(
-		'codex.smartTerminalPaste',
-		() => smartTerminalPaste()
-	);
-	const codeBlockCopyUriHandler = vscode.window.registerUriHandler({
-		handleUri: (uri) => handleCodeBlockCopyUri(uri),
-	});
-
-	context.subscriptions.push(
-		sendWithPrefixCommand,
-		sendWithoutPrefixCommand,
-		smartTerminalPasteCommand,
-		codeBlockCopyUriHandler
-	);
-}
-
 async function handleCodeBlockCopyUri(uri) {
 	try {
 		if (
@@ -290,9 +262,8 @@ function readWindowsClipboard() {
 	});
 }
 
-function deactivate() {}
-
 module.exports = {
-	activate,
-	deactivate,
+	handleCodeBlockCopyUri,
+	sendSelectedCode,
+	smartTerminalPaste,
 };

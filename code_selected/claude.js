@@ -7,22 +7,6 @@ const BRACKETED_PASTE_END = '\u001b[201~';
 const CLAUDE_PROCESS_NAME = 'claude';
 const MAX_PROCESS_DEPTH = 3;
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
-	const sendWithPrefixCommand = vscode.commands.registerCommand(
-		'easyClaude.sendSelectedCode',
-		() => sendSelectedCode(true)
-	);
-	const sendWithoutPrefixCommand = vscode.commands.registerCommand(
-		'easyClaude.sendSelectedCodeWithoutPrefix',
-		() => sendSelectedCode(false)
-	);
-
-	context.subscriptions.push(sendWithPrefixCommand, sendWithoutPrefixCommand);
-}
-
 async function sendSelectedCode(includePrefix) {
 	const editor = vscode.window.activeTextEditor;
 
@@ -126,9 +110,6 @@ function processName(pid) {
 	}
 }
 
-function deactivate() {}
-
 module.exports = {
-	activate,
-	deactivate,
+	sendSelectedCode,
 };
