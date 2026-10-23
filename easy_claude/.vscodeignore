@@ -1,0 +1,6 @@
+.git/**
+.vscode/**
+build/**
+scripts/**
+*.vsix
+test.c

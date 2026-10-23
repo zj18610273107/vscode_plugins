@@ -1,0 +1,74 @@
+{
+  "name": "easy-claude",
+  "displayName": "Easy Claude",
+  "description": "Send selected code location to Claude Code CLI running in the VS Code terminal",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Claude 选中代码发送",
+      "properties": {
+        "easyClaude.autoSubmit": {
+          "type": "boolean",
+          "default": false,
+          "description": "将选中的代码粘贴到 Claude CLI 终端后，是否自动按回车提交。"
+        },
+        "easyClaude.prefix": {
+          "type": "string",
+          "default": "",
+          "description": "发送选中代码位置时添加的前缀。前缀非空时，会在前缀后换行再附加路径和行号。"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "easyClaude.sendSelectedCode",
+        "title": "Claude: 发送选中代码到 CLI（带前缀）"
+      },
+      {
+        "command": "easyClaude.sendSelectedCodeWithoutPrefix",
+        "title": "Claude: 发送选中代码到 CLI（不带前缀）"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "easyClaude.sendSelectedCode",
+        "key": "ctrl+alt+l",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "easyClaude.sendSelectedCode",
+          "group": "claude@1",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "easyClaude.sendSelectedCodeWithoutPrefix",
+          "group": "claude@2",
+          "when": "editorTextFocus"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "echo 'No build step required'"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0"
+  }
+}
