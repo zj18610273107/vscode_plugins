@@ -1,0 +1,960 @@
+{
+    "name": "comment-translate",
+    "displayName": "%commentTranslate.displayName%",
+    "description": "%commentTranslate.description%",
+    "version": "3.1.0",
+    "publisher": "intellsmi",
+    "author": {
+        "name": "Zheng MaoWei",
+        "email": "intellsmi@gmail.com"
+    },
+    "license": "SEE LICENSE IN LICENSE",
+    "homepage": "https://github.com/intellism/vscode-comment-translate/blob/master/README.md",
+    "bugs": {
+        "url": "https://github.com/intellism/vscode-comment-translate/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/intellism/vscode-comment-translate.git"
+    },
+    "engines": {
+        "vscode": "^1.92.0"
+    },
+    "categories": [
+        "AI",
+        "Chat",
+        "Other"
+    ],
+    "keywords": [
+        "comment",
+        "translate",
+        "hover",
+        "google translate",
+        "GitHub Copilot Chat Participant",
+        "翻译",
+        "注释",
+        "翻訳"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "icon": "icon.png",
+    "main": "./dist/extension",
+    "contributes": {
+        "chatParticipants": [
+            {
+                "id": "intellism.translate",
+                "fullName": "Comment Translate",
+                "name": "translate",
+                "description": "I can help you translate into other languages.",
+                "isSticky": true,
+                "commands": [
+                    {
+                        "name": "word",
+                        "description": "Key words explained in detail"
+                    },
+                    {
+                        "name": "var",
+                        "description": "Translate description to variable naming"
+                    }
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "command": "commentTranslate.select",
+                "title": "%commentTranslate.command.select%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.translateForCopilotChat",
+                "title": "%commentTranslate.command.translateForCopilotChat%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.nameVariable",
+                "title": "%commentTranslate.command.nameVariable%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.selectAllText",
+                "title": "%commentTranslate.command.selectAllText%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.selectAllComment",
+                "title": "%commentTranslate.command.selectAllComment%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.translateAllText",
+                "title": "%commentTranslate.command.translateAllText%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.translateAllComment",
+                "title": "%commentTranslate.command.translateAllComment%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.clipboard",
+                "title": "%commentTranslate.command.clipboard%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.changeTranslateSource",
+                "title": "%commentTranslate.command.changeTranslateSource%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.changeTargetLanguage",
+                "title": "%commentTranslate.command.changeTargetLanguage%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.toggleBrowseMode",
+                "title": "%commentTranslate.command.toggleBrowseMode%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.toggleDocumentBrowseMode",
+                "title": "%commentTranslate.command.toggleDocumentBrowseMode%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.openDocumentBrowseMode",
+                "title": "%commentTranslate.command.openDocumentBrowseMode%",
+                "icon": "$(eye-closed)",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.closeDocumentBrowseMode",
+                "title": "%commentTranslate.command.closeDocumentBrowseMode%",
+                "icon": "$(eye)",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.replaceSelections",
+                "title": "%commentTranslate.command.replaceSelections%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.translateTerminalForCopilotChat",
+                "title": "%commentTranslate.command.translateForCopilotChat%",
+                "category": "Comment Translate"
+            },
+            {
+                "command": "commentTranslate.openMarkdownTranslatePreview",
+                "title": "%commentTranslate.command.openMarkdownTranslatePreview%",
+                "icon": "$(symbol-null)",
+                "category": "Comment Translate"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "commentTranslate.select",
+                "key": "alt+shift+s",
+                "mac": "ctrl+shift+s"
+            },
+            {
+                "command": "commentTranslate.nameVariable",
+                "key": "alt+shift+n",
+                "mac": "ctrl+shift+n",
+                "when": "resourceLangId in commentTranslate.canLanguages"
+            },
+            {
+                "command": "commentTranslate.translateForCopilotChat",
+                "key": "alt+shift+y",
+                "mac": "ctrl+shift+y",
+                "when": "github.copilot.activated"
+            },
+            {
+                "command": "commentTranslate.translateTerminalForCopilotChat",
+                "key": "alt+shift+y",
+                "mac": "ctrl+shift+y",
+                "when": "terminalFocus && github.copilot.activated"
+            },
+            {
+                "command": "commentTranslate.replaceSelections",
+                "when": "editorHasSelection",
+                "mac": "ctrl+shift+t",
+                "key": "alt+shift+t"
+            },
+            {
+                "command": "commentTranslate.toggleDocumentBrowseMode",
+                "key": "alt+shift+z",
+                "mac": "ctrl+shift+z"
+            },
+            {
+                "command": "commentTranslate.toggleBrowseMode",
+                "key": "alt+shift+b",
+                "mac": "ctrl+shift+b"
+            }
+        ],
+        "submenus": [
+            {
+                "id": "commentTranslate",
+                "label": "%commentTranslate.displayName%"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "commentTranslate.openMarkdownTranslatePreview",
+                    "when": "resourceLangId == markdown || resourceLangId == prompt || resourceLangId == instructions || resourceLangId == chatagent || resourceLangId == skill"
+                },
+                {
+                    "command": "commentTranslate.openDocumentBrowseMode",
+                    "when": "false"
+                },
+                {
+                    "command": "commentTranslate.closeDocumentBrowseMode",
+                    "when": "false"
+                },
+                {
+                    "command": "commentTranslate.translateForCopilotChat",
+                    "when": "github.copilot.activated"
+                },
+                {
+                    "command": "commentTranslate.translateTerminalForCopilotChat",
+                    "when": "terminalFocus && github.copilot.activated"
+                }
+            ],
+            "editor/title": [
+                {
+                    "command": "commentTranslate.openMarkdownTranslatePreview",
+                    "when": "resourceLangId == markdown || resourceLangId == prompt || resourceLangId == instructions || resourceLangId == chatagent || resourceLangId == skill",
+                    "group": "navigation"
+                },
+                {
+                    "command": "commentTranslate.openDocumentBrowseMode",
+                    "when": "!commentTranslate.ultimatelyBrowseEnable && config.commentTranslate.hover.enabled && resourceLangId in commentTranslate.canLanguages",
+                    "group": "navigation"
+                },
+                {
+                    "command": "commentTranslate.closeDocumentBrowseMode",
+                    "when": "commentTranslate.ultimatelyBrowseEnable && config.commentTranslate.hover.enabled && resourceLangId in commentTranslate.canLanguages",
+                    "group": "navigation"
+                }
+            ],
+            "editor/context": [
+                {
+                    "submenu": "commentTranslate",
+                    "group": "1_translate@0"
+                }
+            ],
+            "terminal/context": [
+                {
+                    "command": "commentTranslate.translateTerminalForCopilotChat",
+                    "when": "github.copilot.activated",
+                    "group": "z_translation"
+                }
+            ],
+            "commentTranslate": [
+                {
+                    "command": "commentTranslate.replaceSelections",
+                    "group": "1_translate@1"
+                },
+                {
+                    "command": "commentTranslate.nameVariable",
+                    "when": "resourceLangId in commentTranslate.canLanguages",
+                    "group": "1_translate@2"
+                },
+                {
+                    "command": "commentTranslate.translateForCopilotChat",
+                    "when": "github.copilot.activated",
+                    "group": "1_translate@3"
+                },
+                {
+                    "command": "commentTranslate.translateAllText",
+                    "when": "resourceLangId in commentTranslate.canLanguages",
+                    "group": "2_file@1"
+                },
+                {
+                    "command": "commentTranslate.translateAllComment",
+                    "when": "resourceLangId in commentTranslate.canLanguages",
+                    "group": "2_file@2"
+                },
+                {
+                    "command": "commentTranslate.selectAllText",
+                    "when": "resourceLangId in commentTranslate.canLanguages",
+                    "group": "3_select@1"
+                },
+                {
+                    "command": "commentTranslate.selectAllComment",
+                    "when": "resourceLangId in commentTranslate.canLanguages",
+                    "group": "3_select@2"
+                }
+            ]
+        },
+        "configuration": [
+            {
+                "title": "Comment Translate Configuration",
+                "type": "Object",
+                "order": 11,
+                "properties": {
+                    "commentTranslate.sourceLanguage": {
+                        "type": "string",
+                        "enum": [
+                            "auto",
+                            "en",
+                            "zh-CN",
+                            "zh-TW",
+                            "ja",
+                            "ko",
+                            "ru",
+                            "de",
+                            "es",
+                            "it",
+                            "fr",
+                            "af",
+                            "sq",
+                            "am",
+                            "ar",
+                            "hy",
+                            "az",
+                            "eu",
+                            "be",
+                            "bn",
+                            "bs",
+                            "bg",
+                            "ca",
+                            "ceb",
+                            "co",
+                            "hr",
+                            "cs",
+                            "da",
+                            "nl",
+                            "eo",
+                            "et",
+                            "fi",
+                            "fy",
+                            "gl",
+                            "ka",
+                            "el",
+                            "gu",
+                            "ht",
+                            "ha",
+                            "haw",
+                            "he",
+                            "hi",
+                            "hmn",
+                            "hu",
+                            "is",
+                            "ig",
+                            "id",
+                            "ga",
+                            "jv",
+                            "kn",
+                            "kk",
+                            "km",
+                            "rw",
+                            "ku",
+                            "ky",
+                            "lo",
+                            "la",
+                            "lv",
+                            "lt",
+                            "lb",
+                            "mk",
+                            "mg",
+                            "ms",
+                            "ml",
+                            "mt",
+                            "mi",
+                            "mr",
+                            "mn",
+                            "my",
+                            "ne",
+                            "no",
+                            "ny",
+                            "or",
+                            "ps",
+                            "fa",
+                            "pl",
+                            "pt",
+                            "pa",
+                            "ro",
+                            "sm",
+                            "gd",
+                            "sr",
+                            "st",
+                            "sn",
+                            "sd",
+                            "si",
+                            "sk",
+                            "sl",
+                            "so",
+                            "su",
+                            "sw",
+                            "sv",
+                            "tl",
+                            "tg",
+                            "ta",
+                            "tt",
+                            "te",
+                            "th",
+                            "tr",
+                            "tk",
+                            "uk",
+                            "ur",
+                            "ug",
+                            "uz",
+                            "vi",
+                            "cy",
+                            "xh",
+                            "yi",
+                            "yo",
+                            "zu"
+                        ],
+                        "enumDescriptions": [
+                            "Auto",
+                            "English",
+                            "Chinese (Simplified)",
+                            "Chinese (Traditional)",
+                            "Japanese",
+                            "Korean",
+                            "Russian",
+                            "German",
+                            "Spanish",
+                            "Italian",
+                            "French",
+                            "Afrikaans",
+                            "Albanian",
+                            "Amharic",
+                            "Arabic",
+                            "Armenian",
+                            "Azerbaijani",
+                            "Basque",
+                            "Belarusian",
+                            "Bengali",
+                            "Bosnian",
+                            "Bulgarian",
+                            "Catalan",
+                            "Cebuano",
+                            "Corsican",
+                            "Croatian",
+                            "Czech",
+                            "Danish",
+                            "Dutch",
+                            "Esperanto",
+                            "Estonian",
+                            "Finnish",
+                            "Frisian",
+                            "Galician",
+                            "Georgian",
+                            "Greek",
+                            "Gujarati",
+                            "Haitian Creole",
+                            "Hausa",
+                            "Hawaiian",
+                            "Hebrew",
+                            "Hindi",
+                            "Hmong",
+                            "Hungarian",
+                            "Icelandic",
+                            "Igbo",
+                            "Indonesian",
+                            "Irish",
+                            "Javanese",
+                            "Kannada",
+                            "Kazakh",
+                            "Khmer",
+                            "Kinyarwanda",
+                            "Kurdish",
+                            "Kyrgyz",
+                            "Lao",
+                            "Latin",
+                            "Latvian",
+                            "Lithuanian",
+                            "Luxembourgish",
+                            "Macedonian",
+                            "Malagasy",
+                            "Malay",
+                            "Malayalam",
+                            "Maltese",
+                            "Maori",
+                            "Marathi",
+                            "Mongolian",
+                            "Myanmar (Burmese)",
+                            "Nepali",
+                            "Norwegian",
+                            "Nyanja (Chichewa)",
+                            "Odia (Oriya)",
+                            "Pashto",
+                            "Persian",
+                            "Polish",
+                            "Portuguese (Portugal, Brazil)",
+                            "Punjabi",
+                            "Romanian",
+                            "Samoan",
+                            "Scots Gaelic",
+                            "Serbian",
+                            "Sesotho",
+                            "Shona",
+                            "Sindhi",
+                            "Sinhala (Sinhalese)",
+                            "Slovak",
+                            "Slovenian",
+                            "Somali",
+                            "Sundanese",
+                            "Swahili",
+                            "Swedish",
+                            "Tagalog (Filipino)",
+                            "Tajik",
+                            "Tamil",
+                            "Tatar",
+                            "Telugu",
+                            "Thai",
+                            "Turkish",
+                            "Turkmen",
+                            "Ukrainian",
+                            "Urdu",
+                            "Uyghur",
+                            "Uzbek",
+                            "Vietnamese",
+                            "Welsh",
+                            "Xhosa",
+                            "Yiddish",
+                            "Yoruba",
+                            "Zulu"
+                        ],
+                        "order": 26,
+                        "default": "auto",
+                        "description": "%commentTranslate.configuration.sourceLanguage%"
+                    },
+                    "commentTranslate.targetLanguage": {
+                        "type": "string",
+                        "enum": [
+                            "en",
+                            "zh-CN",
+                            "zh-TW",
+                            "ja",
+                            "ko",
+                            "ru",
+                            "de",
+                            "es",
+                            "it",
+                            "fr",
+                            "af",
+                            "sq",
+                            "am",
+                            "ar",
+                            "hy",
+                            "az",
+                            "eu",
+                            "be",
+                            "bn",
+                            "bs",
+                            "bg",
+                            "ca",
+                            "ceb",
+                            "co",
+                            "hr",
+                            "cs",
+                            "da",
+                            "nl",
+                            "eo",
+                            "et",
+                            "fi",
+                            "fy",
+                            "gl",
+                            "ka",
+                            "el",
+                            "gu",
+                            "ht",
+                            "ha",
+                            "haw",
+                            "he",
+                            "hi",
+                            "hmn",
+                            "hu",
+                            "is",
+                            "ig",
+                            "id",
+                            "ga",
+                            "jv",
+                            "kn",
+                            "kk",
+                            "km",
+                            "rw",
+                            "ku",
+                            "ky",
+                            "lo",
+                            "la",
+                            "lv",
+                            "lt",
+                            "lb",
+                            "mk",
+                            "mg",
+                            "ms",
+                            "ml",
+                            "mt",
+                            "mi",
+                            "mr",
+                            "mn",
+                            "my",
+                            "ne",
+                            "no",
+                            "ny",
+                            "or",
+                            "ps",
+                            "fa",
+                            "pl",
+                            "pt",
+                            "pa",
+                            "ro",
+                            "sm",
+                            "gd",
+                            "sr",
+                            "st",
+                            "sn",
+                            "sd",
+                            "si",
+                            "sk",
+                            "sl",
+                            "so",
+                            "su",
+                            "sw",
+                            "sv",
+                            "tl",
+                            "tg",
+                            "ta",
+                            "tt",
+                            "te",
+                            "th",
+                            "tr",
+                            "tk",
+                            "uk",
+                            "ur",
+                            "ug",
+                            "uz",
+                            "vi",
+                            "cy",
+                            "xh",
+                            "yi",
+                            "yo",
+                            "zu"
+                        ],
+                        "enumDescriptions": [
+                            "English",
+                            "Chinese (Simplified)",
+                            "Chinese (Traditional)",
+                            "Japanese",
+                            "Korean",
+                            "Russian",
+                            "German",
+                            "Spanish",
+                            "Italian",
+                            "French",
+                            "Afrikaans",
+                            "Albanian",
+                            "Amharic",
+                            "Arabic",
+                            "Armenian",
+                            "Azerbaijani",
+                            "Basque",
+                            "Belarusian",
+                            "Bengali",
+                            "Bosnian",
+                            "Bulgarian",
+                            "Catalan",
+                            "Cebuano",
+                            "Corsican",
+                            "Croatian",
+                            "Czech",
+                            "Danish",
+                            "Dutch",
+                            "Esperanto",
+                            "Estonian",
+                            "Finnish",
+                            "Frisian",
+                            "Galician",
+                            "Georgian",
+                            "Greek",
+                            "Gujarati",
+                            "Haitian Creole",
+                            "Hausa",
+                            "Hawaiian",
+                            "Hebrew",
+                            "Hindi",
+                            "Hmong",
+                            "Hungarian",
+                            "Icelandic",
+                            "Igbo",
+                            "Indonesian",
+                            "Irish",
+                            "Javanese",
+                            "Kannada",
+                            "Kazakh",
+                            "Khmer",
+                            "Kinyarwanda",
+                            "Kurdish",
+                            "Kyrgyz",
+                            "Lao",
+                            "Latin",
+                            "Latvian",
+                            "Lithuanian",
+                            "Luxembourgish",
+                            "Macedonian",
+                            "Malagasy",
+                            "Malay",
+                            "Malayalam",
+                            "Maltese",
+                            "Maori",
+                            "Marathi",
+                            "Mongolian",
+                            "Myanmar (Burmese)",
+                            "Nepali",
+                            "Norwegian",
+                            "Nyanja (Chichewa)",
+                            "Odia (Oriya)",
+                            "Pashto",
+                            "Persian",
+                            "Polish",
+                            "Portuguese (Portugal, Brazil)",
+                            "Punjabi",
+                            "Romanian",
+                            "Samoan",
+                            "Scots Gaelic",
+                            "Serbian",
+                            "Sesotho",
+                            "Shona",
+                            "Sindhi",
+                            "Sinhala (Sinhalese)",
+                            "Slovak",
+                            "Slovenian",
+                            "Somali",
+                            "Sundanese",
+                            "Swahili",
+                            "Swedish",
+                            "Tagalog (Filipino)",
+                            "Tajik",
+                            "Tamil",
+                            "Tatar",
+                            "Telugu",
+                            "Thai",
+                            "Turkish",
+                            "Turkmen",
+                            "Ukrainian",
+                            "Urdu",
+                            "Uyghur",
+                            "Uzbek",
+                            "Vietnamese",
+                            "Welsh",
+                            "Xhosa",
+                            "Yiddish",
+                            "Yoruba",
+                            "Zulu"
+                        ],
+                        "order": 26,
+                        "description": "%commentTranslate.configuration.targetLanguage%"
+                    },
+                    "commentTranslate.mutualTranslate": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 26,
+                        "description": "%commentTranslate.configuration.mutualTranslate%"
+                    },
+                    "commentTranslate.multiLineMerge": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 25,
+                        "description": "%commentTranslate.configuration.MultilineMerge%"
+                    },
+                    "commentTranslate.selectTargetLanguageWhenReplacing": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 27,
+                        "description": "%commentTranslate.configuration.selectTargetLanguageWhenReplacing%"
+                    },
+                    "commentTranslate.hover.concise": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 22,
+                        "description": "%commentTranslate.configuration.concise%"
+                    },
+                    "commentTranslate.hover.content": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 22,
+                        "description": "%commentTranslate.configuration.contentHover%"
+                    },
+                    "commentTranslate.hover.variable": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 24,
+                        "description": "%commentTranslate.configuration.variableHover%"
+                    },
+                    "commentTranslate.hover.nearShow": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 25,
+                        "description": "Show hover overlay near cursor."
+                    },
+                    "commentTranslate.hover.string": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 23,
+                        "description": "%commentTranslate.configuration.stringHover%"
+                    },
+                    "commentTranslate.hover.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 21,
+                        "description": "%commentTranslate.configuration.openHover%"
+                    },
+                    "commentTranslate.browse.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%commentTranslate.configuration.browseEnabled%"
+                    },
+                    "commentTranslate.browse.mode": {
+                        "type": "string",
+                        "default": "contrast",
+                        "enum": [
+                            "contrast",
+                            "inplace"
+                        ],
+                        "description": "%commentTranslate.configuration.browseMode%"
+                    },
+                    "commentTranslate.markdown.scopeFallback": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%commentTranslate.configuration.markdownScopeFallback%"
+                    },
+                    "commentTranslate.source": {
+                        "type": "string",
+                        "default": "Google",
+                        "order": 27,
+                        "description": "%commentTranslate.configuration.source%"
+                    },
+                    "commentTranslate.maxTranslationLength": {
+                        "type": "number",
+                        "default": "10000",
+                        "order": 28,
+                        "description": "%commentTranslate.configuration.maxTranslationLength%"
+                    },
+                    "commentTranslate.ignore": {
+                        "type": "array",
+                        "title": "Ignore text",
+                        "items": {
+                            "type": "object",
+                            "title": "Ignore text item",
+                            "properties": {
+                                "languageId": {
+                                    "type": "string",
+                                    "title": "Language id"
+                                },
+                                "regular": {
+                                    "type": "string",
+                                    "title": "Regular expression"
+                                }
+                            }
+                        },
+                        "default": [
+                            {
+                                "languageId": "javascript,typescript,javascriptreact,typescriptreact",
+                                "regular": "[\\*\\s]+"
+                            },
+                            {
+                                "languageId": "dart",
+                                "regular": "[\\s|/]+"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "ALI Translate Configuration",
+                "type": "Object",
+                "order": 12,
+                "properties": {
+                    "commentTranslate.translationAli.accessKeyId": {
+                        "type": "string",
+                        "description": "accessKeyId"
+                    },
+                    "commentTranslate.translationAli.accessKeySecret": {
+                        "type": "string",
+                        "description": "accessKeySecret"
+                    }
+                }
+            },
+            {
+                "title": "Google Translate Configuration",
+                "type": "Object",
+                "order": 12,
+                "properties": {
+                    "commentTranslate.googleTranslate.tld": {
+                        "type": "string",
+                        "enum": [
+                            "cn",
+                            "com"
+                        ],
+                        "enumDescriptions": [
+                            "Will request 'translate.google.cn' api",
+                            "Will request 'translate.google.com' api"
+                        ],
+                        "default": "com",
+                        "description": "Determine the requested server address"
+                    },
+                    "commentTranslate.googleTranslate.mirror": {
+                        "type": "string",
+                        "markdownDescription": "Determine the requested server mirror address,more read [mirror docs](https://hcfy.app/blog/2022/09/28/ggg#%E6%96%B9%E6%A1%88-c%E4%BD%BF%E7%94%A8%E9%95%9C%E5%83%8F%E5%9C%B0%E5%9D%80%E6%9C%80%E7%AE%80%E5%8D%95)."
+                    }
+                }
+            }
+        ],
+        "translates": [
+            {
+                "translate": "ali.cloud",
+                "title": "Ali Cloud Translate"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "webpack": "webpack --mode development",
+        "webpack-dev": "webpack --mode development --watch",
+        "package": "npm test && webpack --mode production --devtool hidden-source-map",
+        "test": "jest",
+        "test-compile": "tsc -p ./",
+        "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+        "lint:fix": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix"
+    },
+    "dependencies": {
+        "@alicloud/pop-core": "^1.7.10",
+        "bing-translate-api": "^2.9.1",
+        "change-case": "^5.4.4",
+        "cld3-asm": "^4.0.0",
+        "comment-translate-manager": "^0.0.5",
+        "flourite": "^1.3.0",
+        "franc": "^6.2.0",
+        "google-translate-token-with-mirror": "^1.3.1",
+        "got": "^12.1.0",
+        "he": "^1.2.0",
+        "humanize-string": "2.1.0",
+        "marked": "^5.0.2",
+        "onigasm": "^2.2.5",
+        "vscode-oniguruma": "^2.0.1",
+        "vscode-textmate": "^9.3.2"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.12",
+        "@types/marked": "^4.3.0",
+        "@types/node": "^25.2.2",
+        "@types/vscode": "^1.92.0",
+        "@typescript-eslint/eslint-plugin": "^7.18.0",
+        "@typescript-eslint/parser": "^7.18.0",
+        "eslint": "^8.57.1",
+        "file-loader": "^6.2.0",
+        "jest": "^29.7.0",
+        "jest-mock-vscode": "^3.0.5",
+        "reflect-metadata": "^0.2.2",
+        "ts-jest": "^29.2.4",
+        "ts-loader": "^9.3.1",
+        "typescript": "^5.9.3",
+        "webpack": "^5.73.0",
+        "webpack-cli": "^4.10.0"
+    }
+}

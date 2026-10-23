@@ -1,0 +1,35 @@
+{
+    "files.exclude": {
+        "out": false // set this to true to hide the "out" folder with the compiled JS files
+    },
+    "search.exclude": {
+        "out": true // set this to false to include "out" folder in search results
+    },
+    "[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features",
+		"editor.formatOnSave": true
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features",
+		"editor.formatOnSave": true
+	},
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "typescript.tsc.autoDetect": "off",
+    "npm.exclude": [
+        "**/client",
+        "**/server"
+    ],
+    "npm.enableScriptExplorer": true,
+    "cSpell.words": [
+        "Asar",
+        "Kinyarwanda"
+    ],
+    "commentTranslate.multiLineMerge": false,
+    "commentTranslate.targetLanguage": "zh-CN",
+    "commentTranslate.hover.string": true,
+    "commentTranslate.hover.enabled": true,
+    "commentTranslate.source": "naomi233.comment-translate-transmart-transmart",
+    "commentTranslate.browse.mode": "contrast",
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 4,
+}
