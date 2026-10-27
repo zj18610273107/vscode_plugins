@@ -147,6 +147,11 @@ function isCodeLine(grammar: any, text: string): boolean {
             continue;
         }
 
+        // A trailing comma also ends wrapped comment lines, e.g. ` * "compatible",`
+        if (tokenText.trim() === ',' && text.substring(token.endIndex).trim().length === 0) {
+            continue;
+        }
+
         // Code structure punctuation
         if (deepestScope.startsWith('punctuation.terminator')
             || deepestScope.startsWith('punctuation.definition.block')

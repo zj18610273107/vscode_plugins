@@ -136,11 +136,16 @@ export async function compileBlock(block: ICommentBlock, languageId: string, tar
             // Some translation services merge multiline input into fewer lines.
             // Translate each source line separately so comment formatting can be restored.
             if (validText.includes('\n') && translatedText && translatedText.split('\n').length !== validTexts.length) {
-                const lineTranslations = await Promise.all(
-                    validText.split('\n').map(text => autoMutualTranslate(text, { to: targetLanguage }, true))
+                const sourceLines = validText.split('\n');
+                const lineTranslations = await Promise.allSettled(
+                    sourceLines.map(text => autoMutualTranslate(text, { to: targetLanguage }, true))
                 );
-                if (lineTranslations.every(Boolean)) {
-                    translatedText = lineTranslations.join('\n');
+                // Keep the source line when its translation fails, e.g. Bing cannot
+                // translate a bare identifier. Keep the merged translation if all fail.
+                if (lineTranslations.some(res => res.status === 'fulfilled' && res.value)) {
+                    translatedText = lineTranslations
+                        .map((res, i) => res.status === 'fulfilled' && res.value ? res.value : sourceLines[i])
+                        .join('\n');
                 }
             }
 

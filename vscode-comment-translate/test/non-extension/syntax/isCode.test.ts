@@ -93,6 +93,16 @@ describe("isCode", () => {
         expect(result).toEqual([false]);
     });
 
+    test("should NOT detect quoted word with trailing comma in C comment", async () => {
+        const result = await isCode(['"compatible",'], "c", textMateService);
+        expect(result).toEqual([false]);
+    });
+
+    test("should still detect C call with trailing comma", async () => {
+        const result = await isCode(["foo(a, b),"], "c", textMateService);
+        expect(result).toEqual([true]);
+    });
+
     // --- Multi-line ---
     test("should handle multi-line input correctly", async () => {
         const lines = [

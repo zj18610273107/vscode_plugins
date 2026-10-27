@@ -12,11 +12,16 @@ export class BingTranslate extends BaseTranslate {
         content: string,
         { from = "auto", to = "auto" }: ITranslateOptions
     ): Promise<string> {
-        let res = await translate(
-            content,
-            this._langMap(from),
-            this._langMap(to)
-        );
+        const request = () => translate(content, this._langMap(from), this._langMap(to));
+        let res;
+        try {
+            res = await request();
+        } catch (e) {
+            // bing-translate-api throws a TypeError when the request gets no
+            // response at all, e.g. a failed TLS handshake. Retry once.
+            if (!(e instanceof TypeError)) throw e;
+            res = await request();
+        }
         // console.log(res);
         return res.translation;
     }
